@@ -75,13 +75,36 @@ ORDER BY Tot_sales_millions DESC;
 /* AVG Budget and metascore */ 
 WITH CTE_reviews as
 (
-SELECT title, budget/1000000 as budget_Millions, SUM(NorthAmerica + Otherterritories)/1000000 as Tot_sales_millions, AVG(metacritic) as AVG_Meta
-FROM Marvel_sales
-JOIN Marvel_Reviews as reviews
-ON Marvel_Sales.Title = Reviews.film
+SELECT 
+    title,
+    budget / 1000000 AS budget_Millions,
+    SUM(NorthAmerica + Otherterritories) / 1000000 AS Tot_sales_millions,
+    AVG(metacritic) AS AVG_Meta
+FROM
+    Marvel_sales
+        JOIN
+    Marvel_Reviews AS reviews ON Marvel_Sales.Title = Reviews.film
 GROUP BY Title
 ORDER BY Tot_sales_millions DESC
 )
-SELECT avg(budget_millions) as AVG_Budget, AVG_Meta
-FROM CTE_reviews 
+SELECT 
+    AVG(budget_millions) AS AVG_Budget, AVG_Meta
+FROM
+    CTE_reviews
 ORDER BY AVG_Meta DESC;
+
+
+/* all marvel movies ranking above avg on metacritic */ 
+SELECT  film, 
+        Metacritic,
+        CinemaScore
+FROM marvel_reviews
+WHERE metacritic <> 'NA'
+	and metacritic >= 
+(       
+SELECT 
+    AVG(metacritic)
+FROM
+    Marvel_Reviews
+)
+ORDER BY Metacritic ASC;
